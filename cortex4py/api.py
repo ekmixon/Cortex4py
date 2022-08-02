@@ -26,7 +26,7 @@ class Api(object):
 
         self.__api_key = api_key
         self.__url = url
-        self.__base_url = '{}/api/'.format(url)
+        self.__base_url = f'{url}/api/'
         self.__proxies = kwargs.get('proxies', {})
         self.__verify_cert = kwargs.get('verify_cert', kwargs.get('cert', True))
 
@@ -56,16 +56,17 @@ class Api(object):
             raise CortexError("Unexpected exception") from exception
 
     def do_get(self, endpoint, params={}):
-        headers = {
-            'Authorization': 'Bearer {}'.format(self.__api_key)
-        }
+        headers = {'Authorization': f'Bearer {self.__api_key}'}
 
         try:
-            response = requests.get('{}{}'.format(self.__base_url, endpoint),
-                                    headers=headers,
-                                    params=params,
-                                    proxies=self.__proxies,
-                                    verify=self.__verify_cert)
+            response = requests.get(
+                f'{self.__base_url}{endpoint}',
+                headers=headers,
+                params=params,
+                proxies=self.__proxies,
+                verify=self.__verify_cert,
+            )
+
 
             response.raise_for_status()
             return response
@@ -73,17 +74,18 @@ class Api(object):
             self.__recover(ex)
 
     def do_file_post(self, endpoint, data, **kwargs):
-        headers = {
-            'Authorization': 'Bearer {}'.format(self.__api_key)
-        }
+        headers = {'Authorization': f'Bearer {self.__api_key}'}
 
         try:
-            response = requests.post('{}{}'.format(self.__base_url, endpoint),
-                                     headers=headers,
-                                     proxies=self.__proxies,
-                                     data=data,
-                                     verify=self.__verify_cert,
-                                     **kwargs)
+            response = requests.post(
+                f'{self.__base_url}{endpoint}',
+                headers=headers,
+                proxies=self.__proxies,
+                data=data,
+                verify=self.__verify_cert,
+                **kwargs,
+            )
+
             response.raise_for_status()
             return response
         except Exception as ex:
@@ -91,18 +93,22 @@ class Api(object):
 
     def do_post(self, endpoint, data, params={}, **kwargs):
         headers = {
-            'Authorization': 'Bearer {}'.format(self.__api_key),
-            'Content-Type': 'application/json'
+            'Authorization': f'Bearer {self.__api_key}',
+            'Content-Type': 'application/json',
         }
 
+
         try:
-            response = requests.post('{}{}'.format(self.__base_url, endpoint),
-                                     headers=headers,
-                                     proxies=self.__proxies,
-                                     json=data,
-                                     params=params,
-                                     verify=self.__verify_cert,
-                                     **kwargs)
+            response = requests.post(
+                f'{self.__base_url}{endpoint}',
+                headers=headers,
+                proxies=self.__proxies,
+                json=data,
+                params=params,
+                verify=self.__verify_cert,
+                **kwargs,
+            )
+
             response.raise_for_status()
             return response
         except Exception as ex:
@@ -110,37 +116,41 @@ class Api(object):
 
     def do_patch(self, endpoint, data, params={}):
         headers = {
-            'Authorization': 'Bearer {}'.format(self.__api_key),
-            'Content-Type': 'application/json'
+            'Authorization': f'Bearer {self.__api_key}',
+            'Content-Type': 'application/json',
         }
 
+
         try:
-            response = requests.patch('{}{}'.format(self.__base_url, endpoint),
-                                      headers=headers,
-                                      proxies=self.__proxies,
-                                      json=data,
-                                      params=params,
-                                      verify=self.__verify_cert)
+            response = requests.patch(
+                f'{self.__base_url}{endpoint}',
+                headers=headers,
+                proxies=self.__proxies,
+                json=data,
+                params=params,
+                verify=self.__verify_cert,
+            )
+
             response.raise_for_status()
             return response
         except Exception as ex:
             self.__recover(ex)
 
     def do_delete(self, endpoint):
-        headers = {
-            'Authorization': 'Bearer {}'.format(self.__api_key)
-        }
+        headers = {'Authorization': f'Bearer {self.__api_key}'}
 
         try:
-            response = requests.delete('{}{}'.format(self.__base_url, endpoint),
-                                       headers=headers,
-                                       proxies=self.__proxies,
-                                       verify=self.__verify_cert)
+            response = requests.delete(
+                f'{self.__base_url}{endpoint}',
+                headers=headers,
+                proxies=self.__proxies,
+                verify=self.__verify_cert,
+            )
+
             response.raise_for_status()
             return True
         except Exception as ex:
             self.__recover(ex)
-        pass
 
     def status(self):
         return self.do_get('status')

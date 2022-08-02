@@ -18,8 +18,8 @@ class OrganizationsController(AbstractController):
         return self._wrap(self._get_by_id(org_id), Organization)
 
     def get_users(self, organization_id, query, **kwargs):
-        url = 'organization/{}/user/_search'.format(organization_id)
-        params = dict((k, kwargs.get(k, None)) for k in ('sort', 'range'))
+        url = f'organization/{organization_id}/user/_search'
+        params = {k: kwargs.get(k, None) for k in ('sort', 'range')}
 
         return self._wrap(self._api.do_post(url, {'query': query or {}}, params).json(), User)
 
@@ -46,9 +46,9 @@ class OrganizationsController(AbstractController):
         if isinstance(data, Organization):
             data = data.json()
 
-        url = 'organization/{}'.format(org_id)
+        url = f'organization/{org_id}'
         patch = AbstractController._clean_changes(data, ['description', 'status'], fields)
         return self._wrap(self._api.do_patch(url, patch).json(), Organization)
 
     def delete(self, org_id) -> bool:
-        return self._api.do_delete('organization/{}'.format(org_id))
+        return self._api.do_delete(f'organization/{org_id}')

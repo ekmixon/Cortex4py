@@ -27,25 +27,27 @@ class AnalyzersController(AbstractController):
         return self._wrap(self._find_one_by(Eq('name', name)), Analyzer)
 
     def get_by_type(self, data_type) -> List[Analyzer]:
-        return self._wrap(self._api.do_get('analyzer/type/{}'.format(data_type)).json(), Analyzer)
+        return self._wrap(
+            self._api.do_get(f'analyzer/type/{data_type}').json(), Analyzer
+        )
 
     def definitions(self) -> List[AnalyzerDefinition]:
         return self._wrap(self._api.do_get('analyzerdefinition').json(), AnalyzerDefinition)
 
     def enable(self, analyzer_name, config) -> Analyzer:
-        url = 'organization/analyzer/{}'.format(analyzer_name)
+        url = f'organization/analyzer/{analyzer_name}'
         config['name'] = analyzer_name
 
         return self._wrap(self._api.do_post(url, config).json(), Analyzer)
 
     def update(self, analyzer_id, config) -> Analyzer:
-        url = 'analyzer/{}'.format(analyzer_id)
+        url = f'analyzer/{analyzer_id}'
         config.pop('name', None)
 
         return self._wrap(self._api.do_patch(url, config).json(), Analyzer)
 
     def disable(self, analyzer_id) -> bool:
-        return self._api.do_delete('analyzer/{}'.format(analyzer_id))
+        return self._api.do_delete(f'analyzer/{analyzer_id}')
 
     def run_by_id(self, analyzer_id, observable, **kwargs) -> Job:
         tlp = observable.get('tlp', 2)
@@ -78,17 +80,30 @@ class AnalyzersController(AbstractController):
                 '_json': json.dumps(post)
             }
 
-            return self._wrap(self._api.do_file_post('analyzer/{}/run'.format(analyzer_id), data,
-                                                     files=file_def, params=params).json(), Job)
+            return self._wrap(
+                self._api.do_file_post(
+                    f'analyzer/{analyzer_id}/run',
+                    data,
+                    files=file_def,
+                    params=params,
+                ).json(),
+                Job,
+            )
+
         else:
             post['data'] = observable.get('data')
 
-            return self._wrap(self._api.do_post('analyzer/{}/run'.format(analyzer_id), post, params).json(), Job)
+            return self._wrap(
+                self._api.do_post(
+                    f'analyzer/{analyzer_id}/run', post, params
+                ).json(),
+                Job,
+            )
 
     def run_by_name(self, analyzer_name, observable, **kwargs) -> Job:
         analyzer = self.get_by_name(analyzer_name)
 
         if analyzer is None:
-            raise CortexError("Analyzer %s not found" % analyzer_name)
+            raise CortexError(f"Analyzer {analyzer_name} not found")
 
         return self.run_by_id(analyzer.id, observable, **kwargs)

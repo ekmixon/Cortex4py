@@ -12,13 +12,13 @@ class AbstractController(object):
             return data
 
     def _find_all(self, query, **kwargs):
-        url = '{}/_search'.format(self._endpoint)
-        params = dict((k, kwargs.get(k, None)) for k in ('sort', 'range'))
+        url = f'{self._endpoint}/_search'
+        params = {k: kwargs.get(k, None) for k in ('sort', 'range')}
 
         return self._api.do_post(url, {'query': query or {}}, params).json()
 
     def _find_one_by(self, query, **kwargs):
-        url = '{}/_search'.format(self._endpoint)
+        url = f'{self._endpoint}/_search'
 
         params = {
             'range': '0-1'
@@ -28,13 +28,10 @@ class AbstractController(object):
 
         collection = self._api.do_post(url, {'query': query or {}}, params).json()
 
-        if len(collection) > 0:
-            return collection[0]
-        else:
-            return None
+        return collection[0] if len(collection) > 0 else None
 
     def _count(self, query):
-        url = '{}/_stats'.format(self._endpoint)
+        url = f'{self._endpoint}/_stats'
 
         payload = {
             'query': query or {},
@@ -45,13 +42,10 @@ class AbstractController(object):
 
         response = self._api.do_post(url, payload, {}).json()
 
-        if response is not None:
-            return response.get('count', None)
-        else:
-            return None
+        return response.get('count', None) if response is not None else None
 
     def _get_by_id(self, obj_id):
-        url = '{}/{}'.format(self._endpoint, obj_id)
+        url = f'{self._endpoint}/{obj_id}'
 
         return self._api.do_get(url).json()
 
@@ -62,4 +56,4 @@ class AbstractController(object):
         else:
             fields = list(set(allowed) & set(source.keys()))
 
-        return dict((k, source.get(k, None)) for k in fields)
+        return {k: source.get(k, None) for k in fields}

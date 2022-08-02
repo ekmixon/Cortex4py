@@ -17,13 +17,18 @@ class JobsController(AbstractController):
         return self._wrap(self._get_by_id(org_id), Job)
 
     def get_report(self, job_id) -> Job:
-        return self._wrap(self._api.do_get('job/{}/report'.format(job_id)).json(), Job)
+        return self._wrap(self._api.do_get(f'job/{job_id}/report').json(), Job)
 
     def get_report_async(self, job_id, timeout='Inf') -> Job:
-        return self._wrap(self._api.do_get('job/{}/waitreport?atMost={}'.format(job_id, timeout)).json(), Job)
+        return self._wrap(
+            self._api.do_get(f'job/{job_id}/waitreport?atMost={timeout}').json(),
+            Job,
+        )
 
     def get_artifacts(self, job_id) -> List[JobArtifact]:
-        return self._wrap(self._api.do_get('job/{}/artifacts'.format(job_id)).json(), JobArtifact)
+        return self._wrap(
+            self._api.do_get(f'job/{job_id}/artifacts').json(), JobArtifact
+        )
 
     def delete(self, job_id) -> bool:
-        return self._api.do_delete('job/{}'.format(job_id))
+        return self._api.do_delete(f'job/{job_id}')

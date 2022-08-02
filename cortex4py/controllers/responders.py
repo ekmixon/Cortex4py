@@ -22,25 +22,27 @@ class RespondersController(AbstractController):
         return self._wrap(self._find_one_by(Eq('name', name)), Responder)
 
     def get_by_type(self, data_type) -> List[Responder]:
-        return self._wrap(self._api.do_get('responder/type/{}'.format(data_type)).json(), Responder)
+        return self._wrap(
+            self._api.do_get(f'responder/type/{data_type}').json(), Responder
+        )
 
     def definitions(self) -> List[ResponderDefinition]:
         return self._wrap(self._api.do_get('responderdefinition').json(), ResponderDefinition)
 
     def enable(self, responder_name, config) -> Responder:
-        url = 'organization/responder/{}'.format(responder_name)
+        url = f'organization/responder/{responder_name}'
         config['name'] = responder_name
 
         return self._wrap(self._api.do_post(url, config).json(), Responder)
 
     def update(self, worker_id, config) -> Responder:
-        url = 'responder/{}'.format(worker_id)
+        url = f'responder/{worker_id}'
         config.pop('name', None)
 
         return self._wrap(self._api.do_patch(url, config).json(), Responder)
 
     def disable(self, worker_id) -> bool:
-        return self._api.do_delete('responder/{}'.format(worker_id))
+        return self._api.do_delete(f'responder/{worker_id}')
 
     def run_by_id(self, worker_id, data, **kwargs) -> Job:
         tlp = data.get('tlp', 2)
@@ -58,7 +60,9 @@ class RespondersController(AbstractController):
 
         post['data'] = data.get('data')
 
-        return self._wrap(self._api.do_post('responder/{}/run'.format(worker_id), post).json(), Job)
+        return self._wrap(
+            self._api.do_post(f'responder/{worker_id}/run', post).json(), Job
+        )
 
     def run_by_name(self, responder_name, data, **kwargs) -> Job:
         responder = self.get_by_name(responder_name)

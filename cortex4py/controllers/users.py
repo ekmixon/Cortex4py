@@ -29,38 +29,38 @@ class UsersController(AbstractController):
         return User(response)
 
     def update(self, user_id, data, fields=None) -> User:
-        url = 'user/{}'.format(user_id)
+        url = f'user/{user_id}'
         patch = AbstractController._clean_changes(data, ['name', 'organization', 'roles'], fields)
         return self._wrap(self._api.do_patch(url, patch).json(), User)
 
     def lock(self, user_id) -> User:
-        user = self._api.do_patch('user/{}'.format(user_id), {
-            'status': 'Locked'
-        }).json()
+        user = self._api.do_patch(f'user/{user_id}', {'status': 'Locked'}).json()
+
 
         return User(user)
 
     def set_password(self, user_id, password):
-        self._api.do_post('user/{}/password/set'.format(user_id), {'password': password})
+        self._api.do_post(f'user/{user_id}/password/set', {'password': password})
 
         return True
 
     def change_password(self, user_id, current_password, new_password ):
-        self._api.do_post('user/{}/password/change'.format(user_id), {
-            'currentPassword': current_password,
-            'password': new_password
-        })
+        self._api.do_post(
+            f'user/{user_id}/password/change',
+            {'currentPassword': current_password, 'password': new_password},
+        )
+
 
         return True
 
     def set_key(self, user_id):
-        return self._api.do_post('user/{}/key/renew'.format(user_id), {}).text
+        return self._api.do_post(f'user/{user_id}/key/renew', {}).text
 
     def renew_key(self, user_id):
         return self.set_key(user_id)
 
     def get_key(self, user_id):
-        return self._api.do_get('user/{}/key'.format(user_id)).text
+        return self._api.do_get(f'user/{user_id}/key').text
 
     def revoke_key(self, user_id):
-        return self._api.do_delete('user/{}/key'.format(user_id))
+        return self._api.do_delete(f'user/{user_id}/key')
